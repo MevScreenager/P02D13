@@ -23,9 +23,17 @@ int main() {
 }
 
 int input() {
-    char c_1, c_2;
-    scanf("%c")
-    
+    int flag = 0;
+    char c;
+    int scan = scanf("%c", &c);
+    if ( scan != 1 || c != ' ' ) {
+        flag = 1;
+    }
+    char d = getchar();
+    if ( d != '\n' && d != EOF ) {
+        flag = 1;
+    }
+     return flag;
 }
 
 void add(char **field, char **start, int x, int y, int lx, int ly) {}
