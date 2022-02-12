@@ -42,15 +42,15 @@ void draw(char **field) {
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++) {
             if (i == 24 && j == 79) {
-                printf("%c", start[i][j]);
+                printf("%c", field[i][j]);
                 break;
             }
             if (j == 79) {
-                printf("%c\n", start[i][j]);
+                printf("%c\n", field[i][j]);
                 break;
             }
-            printf("%c", start[i][j]);
+            printf("%c", field[i][j]);
         }
 }
 
-int process(char **field) {}
+int process(char **field, char d, char l) {}
