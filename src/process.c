@@ -17,7 +17,7 @@ int process(char **field, char d, char l) {
                 live(field[k][t]);
             }
         }
-    }
+    } return 0;
 }
 
 void dead(char field[m][n], char d, char l) {
