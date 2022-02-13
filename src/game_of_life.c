@@ -11,9 +11,30 @@ void createArr(char **field, char **start, char **field_old, char **field_next);
 int check();    // игра не бессконечна, есть живые клетки и на следующем щаге будет изменение
 
 int main() {
+    int init_matrix[25][80];
     int x = 20, y = 10, lx = 3, ly = 3, game_mode, speed = 1;
     char **field, **start, **field_old, **field_next, d = ' ', l = '0';
 
+    if (read_file(init_matrix) == 1) {
+        printf("n/a");
+        return 1;
+    } else {
+        for(int i = 0; i < 25; i++) {
+            for (int j = 0; j < 80; j++) {
+                printf("%d ", init_matrix[i][j]);
+            }
+            puts("");
+        }
+    }
+    for (int i = 0; i < 25; i++) {
+        field[i] = field_string + 80 * i;
+    }
+    for (int i = 0; i < 25; i++) {
+        for (int j = 0; j < 80; j++) {
+            field[i][j] = init_matrix[i][j];
+        }
+    }
+    
     createArr((char**)field, (char**)start, (char**)field_old, (char**)field_next);
     add((char **) field, (char **) start, x, y, lx, ly);
     in_old((char **) field, (char **) field_old);
@@ -47,6 +68,22 @@ int main() {
     clean(field, 25);
     clean(field_old, 25);
     clean(field_next, 25);
+}
+
+int read_file(int init_matrix[25][80]) {
+    int flag = 0;
+    for (int i = 0; i < 25; i++) {
+        for(int j = 0; j < 80; j++) {
+            int read_int = scanf("%d", &init_matrix[i][j]);
+            if(read_int == 0 || read_int == EOF) {
+                flag = 1;
+                break;
+            }
+        } if(flag) {
+            break;
+        }
+    } freopen("/dev/tty", "r", stdin);
+    return flag;
 }
 
 int check(char ** field_next, char **field, char **field_old) {
@@ -108,24 +145,6 @@ void clean(char **arr, int n) {
         free(arr[i]);
     }
     free(arr);
-}
-
-int read_file(int init_matrix[25][80]) {
-    int flag = 0;
-    for( int i = 0; i < 25; i++ ) {
-        for( int j = 0; j < 80; j++) {
-            int read_int = scanf("%d ", &init_matrix[i][j]);
-            if ( read_int == 0 || read_int == EOF ) {
-                flag = 1;
-                break;
-            }
-        } 
-        if ( flag ) {
-            break;
-        }
-    }
-    freopen("/dev/tty", "r", stdin); // переключаем ввод на консоль
-    return flag;
 }
 
 void input() {
