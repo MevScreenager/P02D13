@@ -197,30 +197,3 @@ void process(int **field_next, int ** field) {
         }
     }
 }
-
-
-// if (read_file(init_matrix) == 1) { // там где считываем матрицу, в елс игровой цикл
-//         printf("n/a");
-//         return 1;
-//     } else {
-//         for(int i = 0; i < 25; ++i) {
-//             for(int j = 0; j < 80; ++j) {
-//                 printf("%d ", init_matrix[i][j]);
-//             }
-//             puts("");
-//         }
-//     }
-//     add((char **) field, (char **) start, x, y, lx, ly);
-//     draw((char **) field);
-//     in_old((char **) field, (char **) field_old);
-//     while (1) {
-//         if (input()) {
-//             if (process((char **) field)) {
-//                 in_old((char **) field, (char **) field_old);
-//                 draw((char **) field);
-//             } else {
-//                 return 0;
-//             }
-//         }
-//         draw((char **) field);
-//     }
