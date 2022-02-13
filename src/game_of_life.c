@@ -59,7 +59,7 @@ int main() {
                 }
                 break;
             }
-            // process(field_next, field);
+            process(field_next, field);
             in_old(field, field_old);
             in_old(field_next, field);
 
@@ -80,21 +80,6 @@ int main() {
     free(field_next);
 
 }
-
-
-// void createArr(int **field, int **field_old, int **field_next) {
-//     fifield = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
-//     field_old = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
-//     field_next = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
-//     int * str = (int*) (field + 25);
-//     int * str1 = (int*) (field_old + 25);
-//     int * str2 = (int*) (field_next + 25);
-//     for (int i = 0; i < 25; i++) {
-//         field[i] = str + 80*i;
-//         field_old[i] = str1 + 80*i;
-//         field_next[i] = str2 + 80*i;
-//     }
-// }
 
 
 int read_file(int init_matrix[25][80]) {
@@ -144,17 +129,15 @@ int check(int **field_next, int **field, int **field_old) {
 }
 
 void input() {
-    char c;
     int flag = 1;
-    while (1) {
-        int scan = scanf("%c", &c);
-        if ( scan != 1 || c != ' ' )
-            flag = 0;
-        char d = getchar();
-        if ( d != '\n' && d != EOF )
-            flag = 0;
-        if (flag) break;
-        printf("\nInput is'n correct.\nTry again: ");
+    char c;
+    int scan = scanf("%c", &c);
+    if ( scan != 1 || c != ' ' ) {
+        flag = 0;
+    }
+    char d = getchar();
+    if ( d != '\n' && d != EOF ) {
+        flag = 0;
     }
 }
 
@@ -188,30 +171,32 @@ void draw(int **field) {
 void process(int **field_next, int ** field) {
     int count = 0;
 
-    for (int i = 0; i < 25; i++)
+    for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 80; j++) {
-            int y[8] = { i - 1, i - 1, i - 1, i, i, i + 1, i + 1, i + 1 }, 
-                x[8] = { j - 1, j, j + 1, j - 1, j + 1, j - 1, j, j + 1 };
-            
+            int y[8] = { i - 1, i - 1, i - 1, 
+                            i,           i, 
+                            i + 1, i + 1, i + 1 }, 
+                x[8] = { j - 1, j, j + 1, 
+                        j - 1,      j + 1, 
+                        j - 1, j, j + 1 };
+                        
             for (int t = 0; t < 8; t++) {
                 if (t < 3 && y[t] < 0) y[t] = 24;
                 if (t > 4 && y[t] > 24) y[t] = 0;
-                if ((t == 0 || t == 3 || t == 5) && x[t] < 0) x[t] = 79;
-                if ((t == 2 || t == 4 || t == 7) && x[t] > 79) x[t] = 0;
+                if ((t == 0 || t == 3 || t == 5) && x[t] < 0) { x[t] = 79; }
+                if ((t == 2 || t == 4 || t == 7) && x[t] > 79) { x[t] = 0; }
             }
-
             for (int k = 0; k < 8; k++)
                 if (field[y[k]][x[k]] == 1)
                     count++;
 
             if (field[i][j] == 0 && count == 3)
                 field_next[i][j] = 1;
-            if (field[i][j] == 1 && (count < 2 || count > 3))
+            else if (field[i][j] == 1 && (count < 2 || count > 3))
                 field_next[i][j] = 0;
         }
+    }
 }
-
-
 
 
 // if (read_file(init_matrix) == 1) { // там где считываем матрицу, в елс игровой цикл
