@@ -9,9 +9,10 @@ int input();
 
 int main() {
     int x = 0, y = 0, lx = 20, ly = 10, progress = 1;
-    char **field = (char**) malloc(sizeof(char*) * 25), 
-         **start = (char**) malloc(sizeof(char*) * ly), 
-         **field_old = (char**) malloc(sizeof(char*) * 25), d = ' ', l = '0';
+    char **field = (char**) malloc(sizeof(char*) * 25),
+         **start = (char**) malloc(sizeof(char*) * ly),
+         **field_old = (char**) malloc(sizeof(char*) * 25),
+         **field_next = (char**) malloc(sizeof(int*) * 25), d = ' ', l = '0';
     for (int i = 0; i < ly; i++) {
         start[i] = (char*) malloc(sizeof(char) * lx);
         for (int j = 0; j < lx; j++)
@@ -20,16 +21,16 @@ int main() {
     for (int i = 0; i < 25; i++) {
         field[i] = (char*)malloc(sizeof(char) * 80);
         field_old[i] = (char*)malloc(sizeof(char) * 80);
-        for (int j = 0; j < 80; j++) {
+        field_next[i] = (char*)malloc(sizeof(char) * 80);
+        for (int j = 0; j < 80; j++)
             field[i][j] = d;
-            field_old[i][j] = d;
-        }
     }
     // x = 0;
     // y = 0;
     add((char **) field, (char **) start, x, y, lx, ly);
     in_old((char **) field, (char **) field_old);
     draw(field);
+    progress = 1;
     
     while (1) {
         if (input()) {
@@ -37,8 +38,12 @@ int main() {
             //     progress = process((char **) field, (char **) field_old, d, l);
             //     draw(field);
             // }
-            progress = 1;
-            if (process((char **) field, (char **) field_old, d, l)) {
+
+    // for (int i = 0; i < 25; i++)
+    //     for (int j = 0; j < 80; j++) {
+    //         field_next[i][j] = 
+    //     }
+            if (process((char **) field, (char **) field_old, d, l)) {// && progress((char**) field_next, field, d, l);) {
                 in_old((char **) field, (char **) field_old);
                 draw((char **) field);
             } 
@@ -112,12 +117,6 @@ void draw(char **field) {
 
 int process(char **field, char ** field_old, char d, char l) {
     int flag = 0, count;
-    flag = 0;
-    // for (int i = 0; i < 25; i++)
-    //     for (int j = 0; j < 80; j++)
-    //         if (field[i][j] == field_old[i][j])
-    //             flag++;
-    // if (flag == 25 * 80) return 0;
 
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++) {
@@ -136,11 +135,17 @@ int process(char **field, char ** field_old, char d, char l) {
                 if (field[y[k]][x[k]] == l)
                     count++;
 
-            if (field_old[i][j] == d && count == 3)
+            if (field[i][j] == d && count == 3)
                 field[i][j] = l;
-            if (field_old[i][j] == l && (count < 2 || count > 3))
+            if (field[i][j] == l && (count < 2 || count > 3))
                 field[i][j] = d;
         }
+    for (int i = 0; i < 25; i++)
+        for (int j = 0; j < 80; j++)
+            if (field[i][j] == field_old[i][j])
+                flag++;
+    if (flag == 25 * 80) return 0;
+
     return 1;
 }
 
