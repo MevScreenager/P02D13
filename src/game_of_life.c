@@ -1,34 +1,32 @@
 #include<stdio.h>
 #include<stdlib.h>
-
-void draw(int **field);    //отрисовка поля
-void add(char **field, char **start, int x, int y, int lx, int ly);   //добавляем стартовую позицию
-void in_old(int **field, int **field_old);    //один массив в другой
-int read_file(int init_matrix[25][80]); // чтение из файла
-void process(int **field_next,  int ** field); //процесс игры
-void input();    //проверка и ввод пробела
-void clean(int **arr, int n);  // отчистка массива
-void createArr(int **field, int **field_old, int **field_next);    //создание массива
-int check(int **field_next, int **field, int **field_old);    // игра не бессконечна, есть живые клетки и на следующем щаге будет изменение
-
+void draw(int **field);
+void add(char **field, char **start, int x, int y, int lx, int ly);
+void in_old(int **field, int **field_old);
+int read_file(int init_matrix[25][80]);
+void process(int **field_next,  int ** field);
+void input();
+void clean(int **arr, int n);
+void createArr(int **field, int **field_old, int **field_next);
+int check(int **field_next, int **field, int **field_old);
 int main() {
     int init_matrix[25][80];
-    int game_mode, speed = 1; //x = 20, y = 10, lx = 3, ly = 3, 
+    int game_mode = 1, speed = 1;
     int **field= NULL, **field_old = NULL, **field_next = NULL;
 
-    // createArr(field, field_old, field_next);
     field = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
     field_old = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
     field_next = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+
     int * str = (int*) (field + 25);
     int * str1 = (int*) (field_old + 25);
     int * str2 = (int*) (field_next + 25);
+
     for (int i = 0; i < 25; i++) {
         field[i] = str + 80*i;
         field_old[i] = str1 + 80*i;
         field_next[i] = str2 + 80*i;
     }
-
     if (read_file(init_matrix) == 1) {
         printf("n/a");
         return 1;
@@ -43,14 +41,12 @@ int main() {
     }
     
     draw(field);
+    process(field_next, field);
 
-//     // выбор режима игры game_mode = 1 -> обычный game_mode = 2-> интерактив
-    game_mode = 1;
-    
     if (game_mode == 1) {
         while (1) {
             input();
-            if (!check(field_next, field, field_old)) { // 0 условия не выполняются или пользователь не хочет продолжать
+            if (!check(field_next, field, field_old)) {
                 for (int i = 0; i < 80; i++) {
                     if (i < 35 || i > 44)
                         printf("-");
@@ -59,10 +55,9 @@ int main() {
                 }
                 break;
             }
-            process(field_next, field);
             in_old(field, field_old);
-            in_old(field_next, field);
-
+            process(field, field_old);
+            process(field_next, field);
             draw(field);
         }
     }
@@ -78,10 +73,7 @@ int main() {
     free(field);
     free(field_old);
     free(field_next);
-
 }
-
-
 int read_file(int init_matrix[25][80]) {
     int flag = 0;
     for (int i = 0; i < 25; i++) {
@@ -97,24 +89,21 @@ int read_file(int init_matrix[25][80]) {
     } freopen("/dev/tty", "r", stdin);
     return flag;
 }
-
 int check(int **field_next, int **field, int **field_old) {
     int flag = 0;
-    /* Если поле не поменялось */
+    
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
             if (field[i][j] == field_old[i][j])
                 flag++;
     if (flag == 25 * 80) return 0;
-
-    /* Если все клетки мертвы */
+    
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
             if (field[i][j] == 0)
                 flag++;
     if (flag == 0) return 0;
-
-    /* Если бесконечный цикл */
+    
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
             if (field_next[i][j] == field_old[i][j])
@@ -127,7 +116,6 @@ int check(int **field_next, int **field, int **field_old) {
     }
     return 1;
 }
-
 void input() {
     int flag = 1;
     char c;
@@ -140,13 +128,11 @@ void input() {
         flag = 0;
     }
 }
-
 void in_old(int **field, int **field_old) {
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
             field_old[i][j] = field[i][j];
 }
-
 void draw(int **field) {
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++) {
@@ -164,15 +150,10 @@ void draw(int **field) {
             else printf("o");
         }
 }
-
-
-
-
-void process(int **field_next, int ** field) {
-    int count = 0;
-
+void process(int **field, int ** field_old) {
     for (int i = 0; i < 25; i++) {
         for (int j = 0; j < 80; j++) {
+            int count = 0;
             int y[8] = { i - 1, i - 1, i - 1, 
                             i,           i, 
                             i + 1, i + 1, i + 1 }, 
@@ -187,13 +168,17 @@ void process(int **field_next, int ** field) {
                 if ((t == 2 || t == 4 || t == 7) && x[t] > 79) { x[t] = 0; }
             }
             for (int k = 0; k < 8; k++)
-                if (field[y[k]][x[k]] == 1)
+                if (field_old[y[k]][x[k]] == 1)
                     count++;
 
-            if (field[i][j] == 0 && count == 3)
-                field_next[i][j] = 1;
-            else if (field[i][j] == 1 && (count < 2 || count > 3))
-                field_next[i][j] = 0;
+            if (field_old[i][j] == 0) {
+                if (count == 3)
+                    field[i][j] = 1;
+            }
+            else {
+                if (count < 2 || count > 3)
+                    field[i][j] = 0;
+            }
         }
     }
 }
