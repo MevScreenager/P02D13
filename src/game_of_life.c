@@ -1,74 +1,101 @@
 #include<stdio.h>
+#include<stdlib.h>
 
-void draw(char **field);    //отрисовка поля
+void draw(int **field);    //отрисовка поля
 void add(char **field, char **start, int x, int y, int lx, int ly);   //добавляем стартовую позицию
-void in_old(char **field, char **field_old);    //один массив в другой
+void in_old(int **field, int **field_old);    //один массив в другой
 int read_file(int init_matrix[25][80]); // чтение из файла
-int process(char **field); //процесс игры
-int input();    //проверка и ввод пробела
-void clean(char **arr, int n);  // отчистка массива
-void createArr(char **field, char **start, char **field_old, char **field_next);    //создание массива
-int check();    // игра не бессконечна, есть живые клетки и на следующем щаге будет изменение
+void process(int **field_next,  int ** field); //процесс игры
+void input();    //проверка и ввод пробела
+void clean(int **arr, int n);  // отчистка массива
+void createArr(int **field, int **field_old, int **field_next);    //создание массива
+int check(int **field_next, int **field, int **field_old);    // игра не бессконечна, есть живые клетки и на следующем щаге будет изменение
 
 int main() {
     int init_matrix[25][80];
-    int x = 20, y = 10, lx = 3, ly = 3, game_mode, speed = 1;
-    char **field, **start, **field_old, **field_next, d = ' ', l = '0';
+    int game_mode, speed = 1; //x = 20, y = 10, lx = 3, ly = 3, 
+    int **field= NULL, **field_old = NULL, **field_next = NULL;
+
+    // createArr(field, field_old, field_next);
+    field = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+    field_old = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+    field_next = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+    int * str = (int*) (field + 25);
+    int * str1 = (int*) (field_old + 25);
+    int * str2 = (int*) (field_next + 25);
+    for (int i = 0; i < 25; i++) {
+        field[i] = str + 80*i;
+        field_old[i] = str1 + 80*i;
+        field_next[i] = str2 + 80*i;
+    }
 
     if (read_file(init_matrix) == 1) {
         printf("n/a");
         return 1;
-    } else {
-        for(int i = 0; i < 25; i++) {
-            for (int j = 0; j < 80; j++) {
-                printf("%d ", init_matrix[i][j]);
-            }
-            puts("");
-        }
     }
-    for (int i = 0; i < 25; i++) {
-        field[i] = field_string + 80 * i;
-    }
-    for (int i = 0; i < 25; i++) {
+     
+    for (int i = 0; i<25; i++) {
         for (int j = 0; j < 80; j++) {
             field[i][j] = init_matrix[i][j];
+            field_old[i][j] = 0;
+            field_next[i][j] = field[i][j];
         }
     }
     
-    createArr((char**)field, (char**)start, (char**)field_old, (char**)field_next);
-    add((char **) field, (char **) start, x, y, lx, ly);
-    in_old((char **) field, (char **) field_old);
     draw(field);
 
-
-    // выбор режима игры game_mode = 1 -> обычный game_mode = 2-> интерактив
-
+//     // выбор режима игры game_mode = 1 -> обычный game_mode = 2-> интерактив
+    game_mode = 1;
+    
     if (game_mode == 1) {
         while (1) {
             input();
-            if (!check()) { // 0 условия не выполняются или пользователь не хочет продолжать
+            if (!check(field_next, field, field_old)) { // 0 условия не выполняются или пользователь не хочет продолжать
                 for (int i = 0; i < 80; i++) {
                     if (i < 35 || i > 44)
                         printf("-");
                     if (i == 35)
                         printf(" The end! ");
                 }
+                break;
             }
-            process((char **) field, (char **) field_old, field_next, d, l, 0);
-            in_old((char **) field, (char **) field_old);
-            in_old((char **) field, (char **) field_next);
-            draw((char **) field);
+            // process(field_next, field);
+            in_old(field, field_old);
+            in_old(field_next, field);
+
+            draw(field);
         }
     }
     else {
-        // метод который 
+        switch (speed) {
+            case 1: break;
+            case 2: break;
+            case 3: break;
+            case 4: break;
+            case 5: break;
+        }
     }
+    free(field);
+    free(field_old);
+    free(field_next);
 
-    clean(start, ly);
-    clean(field, 25);
-    clean(field_old, 25);
-    clean(field_next, 25);
 }
+
+
+// void createArr(int **field, int **field_old, int **field_next) {
+//     fifield = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+//     field_old = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+//     field_next = malloc(sizeof(int) * 25 * 80 + 25 * sizeof(int*));
+//     int * str = (int*) (field + 25);
+//     int * str1 = (int*) (field_old + 25);
+//     int * str2 = (int*) (field_next + 25);
+//     for (int i = 0; i < 25; i++) {
+//         field[i] = str + 80*i;
+//         field_old[i] = str1 + 80*i;
+//         field_next[i] = str2 + 80*i;
+//     }
+// }
+
 
 int read_file(int init_matrix[25][80]) {
     int flag = 0;
@@ -86,7 +113,7 @@ int read_file(int init_matrix[25][80]) {
     return flag;
 }
 
-int check(char ** field_next, char **field, char **field_old) {
+int check(int **field_next, int **field, int **field_old) {
     int flag = 0;
     /* Если поле не поменялось */
     for (int i = 0; i < 25; i++)
@@ -98,14 +125,14 @@ int check(char ** field_next, char **field, char **field_old) {
     /* Если все клетки мертвы */
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
-            if (field[i][j] == d)
+            if (field[i][j] == 0)
                 flag++;
     if (flag == 0) return 0;
 
     /* Если бесконечный цикл */
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
-            if (field[i][j] == field_old_old[i][j])
+            if (field_next[i][j] == field_old[i][j])
                 flag++;
     if (flag == 25 * 80) {
         int a;
@@ -114,37 +141,6 @@ int check(char ** field_next, char **field, char **field_old) {
         if (a == 2) return 0;
     }
     return 1;
-}
-
-void createArr(char **field, char **start, char **field_old, char **field_next) {
-    **field = (char**) malloc(sizeof(char*) * 25);
-    **start = (char**) malloc(sizeof(char*) * ly);
-    **field_old = (char**) malloc(sizeof(char*) * 25);
-    **field_next = (char**) malloc(sizeof(int*) * 25), d = ' ', l = '0';
-    
-    for (int i = 0; i < ly; i++) {
-        start[i] = (char*) malloc(sizeof(char) * lx);
-        for (int j = 0; j < lx; j++) {
-            if (j == 1 || i == 1)
-                start[i][j] = l;
-            else start[i][j] = d;
-        }
-    }
-
-    for (int i = 0; i < 25; i++) {
-        field[i] = (char*)malloc(sizeof(char) * 80);
-        field_old[i] = (char*)malloc(sizeof(char) * 80);
-        field_next[i] = (char*)malloc(sizeof(char) * 80);
-        for (int j = 0; j < 80; j++)
-            field[i][j] = d;
-    }
-}
-
-void clean(char **arr, int n) {
-    for(int i = 0; i < n; i++) {
-        free(arr[i]);
-    }
-    free(arr);
 }
 
 void input() {
@@ -158,105 +154,63 @@ void input() {
         if ( d != '\n' && d != EOF )
             flag = 0;
         if (flag) break;
-        printf("\nInput is'n correct.\nTry again: ")
+        printf("\nInput is'n correct.\nTry again: ");
     }
 }
 
-void in_old(char **field, char **field_old) {
+void in_old(int **field, int **field_old) {
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++)
             field_old[i][j] = field[i][j];
 }
 
-void add(char **field, char **start, int x, int y, int lx, int ly) {
-    for (int i = y; i < ly + y; i++)
-        for (int j = x; j < lx + x; j++) {
-            if (i >= y && j >= x && i < y + ly && j < x + lx)
-                field[i][j] = start[i - y][j - x];
-        }
-}
-
-void draw(char **field) {
+void draw(int **field) {
     for (int i = 0; i < 25; i++)
         for (int j = 0; j < 80; j++) {
             if (i == 24 && j == 79) {
-                printf("%c", field[i][j]);
+                if (field[i][j] == 0) printf(" ");
+                else printf("o");
                 break;
             }
             if (j == 79) {
-                printf("%c\n", field[i][j]);
+                if (field[i][j] == 0) printf(" \n");
+                else printf("o\n");
                 break;
             }
-            printf("%c", field[i][j]);
+            if (field[i][j] == 0) printf(" ");
+            else printf("o");
         }
 }
 
 
 
 
-
-int process(char **field, char d, char l) {
-    for (int k = 0; k < 25; k++) {
-        for (int t = 0; t< 80; t++) {
-            if (field[k][t] = d) {
-                dead(field[k][t], **field);
-                }
-            if (field[k][t] = l) {
-                live(field[k][t], **field);
-            }
-        }
-    } return 0;
-}
-
-void dead(char field[m][n], char **field) {
+void process(int **field_next, int ** field) {
     int count = 0;
-    for (int i = m - 1; i <= m + 1; i++) {
-        for (int j = n - 1; j <= n + 1; j++) {
-            if (i < 0) {
-                i = 24;
+
+    for (int i = 0; i < 25; i++)
+        for (int j = 0; j < 80; j++) {
+            int y[8] = { i - 1, i - 1, i - 1, i, i, i + 1, i + 1, i + 1 }, 
+                x[8] = { j - 1, j, j + 1, j - 1, j + 1, j - 1, j, j + 1 };
+            
+            for (int t = 0; t < 8; t++) {
+                if (t < 3 && y[t] < 0) y[t] = 24;
+                if (t > 4 && y[t] > 24) y[t] = 0;
+                if ((t == 0 || t == 3 || t == 5) && x[t] < 0) x[t] = 79;
+                if ((t == 2 || t == 4 || t == 7) && x[t] > 79) x[t] = 0;
             }
-            if (i > 24) {
-                i = 0;
-            }
-            if (j < 0) {
-                j = 79;
-            }
-            if (j > 79) {
-                j = 0;
-            }
-            if (field [i][j] = l) {
-                count++;
-            }
+
+            for (int k = 0; k < 8; k++)
+                if (field[y[k]][x[k]] == 1)
+                    count++;
+
+            if (field[i][j] == 0 && count == 3)
+                field_next[i][j] = 1;
+            if (field[i][j] == 1 && (count < 2 || count > 3))
+                field_next[i][j] = 0;
         }
-    } if (count = 3) {
-        field[m][n] = l;
-    }
 }
 
-void live(char field[m][n], char **field) {
-    int count = -1;
-    for (int i = m - 1; i <= m + 1; i++) {
-        for {int j = n - 1}; j <= n + 1; j++) {
-            if (i < 0) {
-                i = 24;
-            }
-            if (i > 24) {
-                i = 0;
-            }
-            if (j < 0) {
-                j = 79:
-            }
-            if (j > 79) {
-                j = 0:
-            }
-            if (field[i][j] = l) {
-                count++;
-            }
-        }
-    } if (count < 2 || count > 3) {
-            field[m][n] = d;
-    }
-}
 
 
 
